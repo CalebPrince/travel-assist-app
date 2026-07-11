@@ -68,7 +68,11 @@ All runtime configuration (Anthropic API key, model, JWT signing secret) lives i
 
 `server.py` / `php -S` are for local development only — cPanel serves via Apache or LiteSpeed, which is why `public/.htaccess` exists (it does the same job `router.php` does locally: everything that isn't a real file gets routed to `index.php`).
 
-**The most important rule:** the subdomain's document root must point at the `public/` folder specifically — never at the project root. `src/`, `database/`, `.git`, and `server.py` must stay outside the web-served directory so they're not publicly downloadable (this is exactly why the blueprint separates `public/` from everything else).
+**The most important rule:** the subdomain's document root must point at the `public/` folder specifically — never at the project root.
+
+Ideally, clone the repo *outside* `public_html` entirely (e.g. your home directory) so `src/` and `database/` are never inside any web-served tree. In practice, cPanel's Git tool often defaults to cloning inside `public_html` (e.g. `public_html/travelassist`, with the subdomain root at `public_html/travelassist/public`) — that's fine too, **but only because `database/.htaccess` and `src/.htaccess` in this repo explicitly deny all web access to those folders.** Without them, anyone could download `database/app.sqlite` (which contains the admin password hash and your Anthropic API key) directly via your **primary domain**, e.g. `https://yourdomain.com/travelassist/database/app.sqlite` — since `public_html` is usually the primary domain's own document root, and a subfolder inside it is reachable through that domain too, regardless of what the subdomain's document root points to.
+
+After deploying, verify this is actually blocked: visit `https://yourdomain.com/travelassist/database/app.sqlite` (adjust the path to match your setup) and confirm you get a 403, not a file download.
 
 ### 1. Create the subdomain
 
@@ -79,12 +83,13 @@ In cPanel → **Domains** → **Create A New Domain**, enter the subdomain (e.g.
 Preferred — cPanel's **Git™ Version Control** tool (Namecheap cPanel includes this):
 1. cPanel → **Git Version Control** → **Create**
 2. Repository URL: `https://github.com/CalebPrince/travel-assist-app.git`
-3. Repository Path: `travel-assist-app` (a directory *above* `public_html`, e.g. your home directory — not inside `public_html` itself)
-4. Deploy the `main` branch
+3. Repository Path: ideally a directory *above* `public_html` (e.g. your home directory) — but cPanel's default suggestion of a path inside `public_html` (e.g. `public_html/travelassist`) is also fine, since `database/.htaccess` and `src/.htaccess` block direct web access to those folders either way
+4. Set the subdomain's document root to `<repository path>/public`
+5. Deploy the `main` branch
 
-This clones the whole repo (including `src/` and `database/`) into `~/travel-assist-app`, while the subdomain's document root (`~/travel-assist-app/public`) only serves the `public/` subfolder — `src/` and `database/` stay unreachable from the web. To ship updates later, `git push` to GitHub, then click **Update** in the Git Version Control UI (or `git pull` via Terminal).
+To ship updates later, `git push` to GitHub, then in cPanel go to the repo → **Manage** → **Pull or Deploy** → **Update from Remote** (or `git pull` via Terminal). It's live as soon as the pull finishes — no separate deploy step.
 
-Fallback — no Git tool available: zip the repo locally, upload via **File Manager**, extract to `~/travel-assist-app`, and set the document root the same way.
+Fallback — no Git tool available: zip the repo locally, upload via **File Manager**, extract, and set the document root the same way.
 
 ### 3. Set the PHP version and extensions
 
@@ -95,7 +100,7 @@ cPanel → **Select PHP Extensions** (or **MultiPHP INI Editor**): ensure `pdo_s
 
 This creates `database/app.sqlite`, generates the JWT secret, and seeds a one-time admin account.
 
-- If cPanel gives you **Terminal** (Namecheap shared hosting usually does): `cd ~/travel-assist-app && php database/migrate.php` — copy the printed admin username/password before closing.
+- If cPanel gives you **Terminal** (Namecheap shared hosting usually does): `cd` into your repository path (e.g. `~/travelassist` or `~/public_html/travelassist`) and run `php database/migrate.php` — copy the printed admin username/password before closing.
 - No Terminal: temporarily create `public/migrate-once.php` containing `<?php require __DIR__ . '/../database/migrate.php';`, visit `https://travel.yourdomain.com/migrate-once.php` once in a browser to see the output, then **delete that file immediately** — leaving a public migration endpoint live is a security hole.
 
 ### 5. Go live
