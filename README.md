@@ -40,9 +40,10 @@ server.py                  Orchestrator: checks environment, runs migrations, st
 database/
   schema.sql                Table definitions (sessions, messages, admins, settings)
   migrate.php                Idempotent migration runner + first-run seeding
-public/                    Web root
+public/                    Web root (point your server/subdomain document root here)
   index.php                  Front controller for /api/v1/* routes
-  router.php                  Dev-server router (serves static files, else defers to index.php)
+  router.php                  Dev-server router, used only by `php -S` (see Getting Started)
+  .htaccess                   Apache/LiteSpeed rewrite rules, used only on real web servers (see Deployment)
   index.html                  Landing page
   chat.html                   Advisor chat UI
   admin/                       Admin dashboard (login, settings, dashboard)
@@ -62,3 +63,44 @@ All runtime configuration (Anthropic API key, model, JWT signing secret) lives i
 
 - `database/app.sqlite` contains the admin password hash and API key — it's git-ignored and should never be committed
 - Change the seeded admin password immediately after first login
+
+## Deploying to a Subdomain on cPanel (Namecheap Shared Hosting)
+
+`server.py` / `php -S` are for local development only — cPanel serves via Apache or LiteSpeed, which is why `public/.htaccess` exists (it does the same job `router.php` does locally: everything that isn't a real file gets routed to `index.php`).
+
+**The most important rule:** the subdomain's document root must point at the `public/` folder specifically — never at the project root. `src/`, `database/`, `.git`, and `server.py` must stay outside the web-served directory so they're not publicly downloadable (this is exactly why the blueprint separates `public/` from everything else).
+
+### 1. Create the subdomain
+
+In cPanel → **Domains** → **Create A New Domain**, enter the subdomain (e.g. `travel.yourdomain.com`). Cpanel will offer a document root like `public_html/travel` — **change it** to `public_html/travel-assist-app/public` (or wherever you place the project, as long as it ends in `/public`).
+
+### 2. Get the code onto the server
+
+Preferred — cPanel's **Git™ Version Control** tool (Namecheap cPanel includes this):
+1. cPanel → **Git Version Control** → **Create**
+2. Repository URL: `https://github.com/CalebPrince/travel-assist-app.git`
+3. Repository Path: `travel-assist-app` (a directory *above* `public_html`, e.g. your home directory — not inside `public_html` itself)
+4. Deploy the `main` branch
+
+This clones the whole repo (including `src/` and `database/`) into `~/travel-assist-app`, while the subdomain's document root (`~/travel-assist-app/public`) only serves the `public/` subfolder — `src/` and `database/` stay unreachable from the web. To ship updates later, `git push` to GitHub, then click **Update** in the Git Version Control UI (or `git pull` via Terminal).
+
+Fallback — no Git tool available: zip the repo locally, upload via **File Manager**, extract to `~/travel-assist-app`, and set the document root the same way.
+
+### 3. Set the PHP version and extensions
+
+cPanel → **MultiPHP Manager**: select the subdomain, set PHP to **8.1 or higher**.
+cPanel → **Select PHP Extensions** (or **MultiPHP INI Editor**): ensure `pdo_sqlite`, `sqlite3`, and `openssl` are enabled. `curl` is used automatically if present, otherwise the app falls back to PHP streams — either works.
+
+### 4. Run the migration once
+
+This creates `database/app.sqlite`, generates the JWT secret, and seeds a one-time admin account.
+
+- If cPanel gives you **Terminal** (Namecheap shared hosting usually does): `cd ~/travel-assist-app && php database/migrate.php` — copy the printed admin username/password before closing.
+- No Terminal: temporarily create `public/migrate-once.php` containing `<?php require __DIR__ . '/../database/migrate.php';`, visit `https://travel.yourdomain.com/migrate-once.php` once in a browser to see the output, then **delete that file immediately** — leaving a public migration endpoint live is a security hole.
+
+### 5. Go live
+
+1. cPanel → **SSL/TLS Status**, run **AutoSSL** for the subdomain (Namecheap issues a free cert), then enable **Force HTTPS Redirect**
+2. Visit `https://travel.yourdomain.com/admin/login.html`, sign in with the credentials from step 4, and change the password immediately
+3. In **Settings**, add your Anthropic API key
+4. Visit `https://travel.yourdomain.com/` — the advisor is live

@@ -112,29 +112,15 @@ class ChatController
             'messages' => $messages,
         ]);
 
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => implode("\r\n", [
-                    'Content-Type: application/json',
-                    'x-api-key: ' . $apiKey,
-                    'anthropic-version: 2023-06-01',
-                ]),
-                'content' => $payload,
-                'timeout' => 30,
-                'ignore_errors' => true,
-            ],
-        ]);
+        $headers = [
+            'Content-Type: application/json',
+            'x-api-key: ' . $apiKey,
+            'anthropic-version: 2023-06-01',
+        ];
 
-        $response = @file_get_contents('https://api.anthropic.com/v1/messages', false, $context);
-        if ($response === false) {
-            throw new RuntimeException('Failed to reach the Anthropic API.');
-        }
-
-        $status = 0;
-        if (isset($http_response_header[0]) && preg_match('#HTTP/\S+\s+(\d+)#', $http_response_header[0], $m)) {
-            $status = (int) $m[1];
-        }
+        [$status, $response] = function_exists('curl_init')
+            ? self::postViaCurl($payload, $headers)
+            : self::postViaStream($payload, $headers);
 
         $decoded = json_decode($response, true);
 
@@ -151,5 +137,56 @@ class ChatController
         }
 
         return $text;
+    }
+
+    /** @return array{0: int, 1: string} */
+    private static function postViaCurl(string $payload, array $headers): array
+    {
+        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new RuntimeException('Failed to reach the Anthropic API: ' . $error);
+        }
+
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return [$status, (string) $response];
+    }
+
+    /** @return array{0: int, 1: string} */
+    private static function postViaStream(string $payload, array $headers): array
+    {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => implode("\r\n", $headers),
+                'content' => $payload,
+                'timeout' => 30,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $response = @file_get_contents('https://api.anthropic.com/v1/messages', false, $context);
+        if ($response === false) {
+            throw new RuntimeException('Failed to reach the Anthropic API.');
+        }
+
+        $status = 0;
+        if (isset($http_response_header[0]) && preg_match('#HTTP/\S+\s+(\d+)#', $http_response_header[0], $m)) {
+            $status = (int) $m[1];
+        }
+
+        return [$status, $response];
     }
 }
