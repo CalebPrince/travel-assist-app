@@ -1,0 +1,3 @@
+.env
+database/app.sqlite
+.claude/settings.local.json

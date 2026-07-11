@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Travel Assist — Immigration &amp; Study Abroad Advisor</title>
+<meta name="description" content="Travel Assist turns confusing visa rules and admissions paperwork into a clear, step-by-step plan for students and travelers moving abroad.">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="/css/theme.css" rel="stylesheet">
+<style>
+  body { background: #f5f6fa; }
+
+  .hero {
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 100%);
+    color: #fff;
+  }
+  .hero .badge-pill {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+  }
+
+  section h2 { font-weight: 700; }
+  .section-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .hover-card { transition: transform .15s ease, box-shadow .15s ease; }
+  .hover-card:hover { transform: translateY(-4px); box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.08); }
+
+  .step-number {
+    width: 2.5rem; height: 2.5rem;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon-badge {
+    width: 3rem; height: 3rem;
+    border-radius: .75rem;
+    background: rgba(13,27,42,.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+
+  .cta-band {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    color: #fff;
+  }
+
+  .persona-card .card-header { font-size: 1.1rem; }
+
+  .disclaimer-section { background: #fff8e6; border-top: 1px solid #f1e2b3; border-bottom: 1px solid #f1e2b3; }
+  .disclaimer-card { border-left: 4px solid #d69e00 !important; }
+  .warning-icon-badge {
+    width: 4rem; height: 4rem;
+    border-radius: 50%;
+    background: rgba(214,158,0,.15);
+    border: 2px solid rgba(214,158,0,.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+  }
+
+  .notice-bar {
+    background: #fff3cd;
+    color: #664d03;
+    border-bottom: 1px solid #f1e2b3;
+  }
+  .notice-bar:hover { background: #ffecb5; color: #664d03; }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+    <span class="navbar-brand mb-0 h1">Travel Assist</span>
+    <span class="text-light small d-none d-sm-inline">Immigration &amp; Study Abroad Advisor</span>
+  </div>
+</nav>
+
+<a href="#disclaimer" class="notice-bar d-block text-center text-decoration-none py-2 small">
+  ⚠️ Informational guidance only — no guaranteed outcomes. <span class="text-decoration-underline">Read our disclaimer</span> &rarr;
+</a>
+
+<!-- HERO -->
+<header class="hero py-5">
+  <div class="container py-4 text-center">
+    <span class="badge rounded-pill badge-pill text-white fw-normal px-3 py-2 mb-3">
+      AI-guided &middot; Step-by-step &middot; Built for real deadlines
+    </span>
+    <h1 class="display-5 fw-bold">Navigate Immigration &amp; Study Abroad with Confidence</h1>
+    <p class="lead col-lg-8 mx-auto text-white-50 mt-3">
+      Moving across borders involves scattered rules, shifting requirements, and paperwork
+      that's easy to get wrong. Travel Assist turns all of it into one clear, personalized
+      pipeline — from choosing a destination to landing at arrivals.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+      <a href="/chat.html?intent=study" class="btn btn-primary btn-lg px-4">🎓 Plan My Study Abroad Journey</a>
+      <a href="/chat.html?intent=travel" class="btn btn-outline-light btn-lg px-4">✈️ Plan My Trip</a>
+    </div>
+    <p class="small text-white-50 mt-3 mb-0">
+      No account needed to start &middot; <a href="/chat.html" class="text-white-50">or just start a general conversation &rarr;</a>
+    </p>
+  </div>
+</header>
+
+<!-- WHAT WE DO -->
+<section class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <div class="section-eyebrow">What Travel Assist Does</div>
+      <h2 class="mt-2">One advisor, two journeys, zero guesswork</h2>
+      <p class="text-muted mt-3">
+        Whether you're applying to a university abroad or booking a trip, the hardest part
+        usually isn't the destination — it's figuring out <em>what to do in what order</em>.
+        Travel Assist breaks that down into sequential milestones, tells you exactly which
+        documents you need at each stage, and flags anything that depends on your specific
+        nationality so you always know what still needs official verification.
+      </p>
+      <ul class="list-unstyled mt-4">
+        <li class="mb-2">✅ Personalized to your passport, destination, and timeline</li>
+        <li class="mb-2">✅ Clear document checklists, not vague advice</li>
+        <li class="mb-2">✅ Flags nationality-specific rules for embassy verification</li>
+      </ul>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h3 class="h6 text-muted mb-3">A typical conversation covers</h3>
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <span class="icon-badge">🧭</span>
+            <div>
+              <strong>Where you're starting from</strong>
+              <div class="text-muted small">Passport/citizenship, budget, and timeline</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <span class="icon-badge">📋</span>
+            <div>
+              <strong>What you'll need</strong>
+              <div class="text-muted small">Exact documents, forms, and proof requirements</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-start gap-3">
+            <span class="icon-badge">🗓️</span>
+            <div>
+              <strong>What order to do it in</strong>
+              <div class="text-muted small">Sequenced milestones so nothing is missed or late</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCLAIMER -->
+<section id="disclaimer" class="disclaimer-section py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="card border-0 shadow-sm disclaimer-card">
+          <div class="card-body p-4 p-md-5">
+            <div class="d-flex align-items-start gap-4 flex-column flex-md-row">
+              <span class="warning-icon-badge flex-shrink-0" aria-hidden="true">⚠️</span>
+              <div>
+                <h2 class="h5 mb-3">Important: Please Read Before You Rely On This</h2>
+                <p class="text-muted mb-2">
+                  Travel Assist provides <strong>informational guidance only</strong>. We are not a law firm,
+                  immigration consultancy, or government body, and nothing here is legal advice. We do not
+                  guarantee visa approval, university admission, or any other outcome — decisions always rest
+                  with the relevant embassy, consulate, or institution.
+                </p>
+                <p class="text-muted mb-2">
+                  What we do commit to: walking you through the process the right way — legally, transparently,
+                  and step by step — and flagging anything that depends on your nationality or changes frequently
+                  so you verify it through the official embassy or institutional portal before acting on it.
+                </p>
+                <p class="text-muted small mb-0">
+                  Always confirm final requirements, fees, and deadlines directly with the official government or
+                  institutional source for your destination.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-eyebrow">How It Works</div>
+      <h2 class="mt-2">Four steps from "where do I start" to "I'm ready"</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="d-flex flex-column align-items-center text-center h-100">
+          <span class="step-number mb-3">1</span>
+          <h3 class="h6">Tell us your situation</h3>
+          <p class="text-muted small">Study or travel, your passport country, destination, and timeline.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="d-flex flex-column align-items-center text-center h-100">
+          <span class="step-number mb-3">2</span>
+          <h3 class="h6">Get your pipeline</h3>
+          <p class="text-muted small">A phased roadmap built specifically for your path, not generic advice.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="d-flex flex-column align-items-center text-center h-100">
+          <span class="step-number mb-3">3</span>
+          <h3 class="h6">Work the checklist</h3>
+          <p class="text-muted small">Clear, checkable document and task lists for every phase.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="d-flex flex-column align-items-center text-center h-100">
+          <span class="step-number mb-3">4</span>
+          <h3 class="h6">Arrive prepared</h3>
+          <p class="text-muted small">From biometrics to arrival compliance, know what's next at every step.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHOOSE YOUR PATH -->
+<section class="container py-5">
+  <div class="text-center mb-5">
+    <div class="section-eyebrow">Choose Your Path</div>
+    <h2 class="mt-2">Two journeys, each with its own roadmap</h2>
+  </div>
+  <div class="row g-4 justify-content-center">
+    <div class="col-md-5">
+      <div class="card persona-card hover-card h-100 shadow-sm">
+        <div class="card-header bg-navy text-white border-0">🎓 Studying Abroad</div>
+        <div class="card-body d-flex flex-column">
+          <p class="text-muted">
+            Undergraduate, postgraduate, or language programs. We'll walk you through:
+          </p>
+          <ul class="text-muted small">
+            <li>Academic &amp; country selection</li>
+            <li>Admissions (SOP, transcripts, language tests)</li>
+            <li>Visa &amp; legal documentation</li>
+            <li>Pre-departure planning</li>
+          </ul>
+          <a href="/chat.html?intent=study" class="btn btn-primary mt-auto">Plan My Study Abroad Journey</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card persona-card hover-card h-100 shadow-sm">
+        <div class="card-header bg-navy-mid text-white border-0">✈️ General Travel</div>
+        <div class="card-body d-flex flex-column">
+          <p class="text-muted">
+            Tourism, digital nomad, or relocation trips. We'll walk you through:
+          </p>
+          <ul class="text-muted small">
+            <li>Visa category matrix (eVisa, VOA, tourist, digital nomad, golden visa)</li>
+            <li>Core border document stack</li>
+            <li>Financial &amp; insurance requirements</li>
+            <li>Arrival compliance &amp; customs</li>
+          </ul>
+          <a href="/chat.html?intent=travel" class="btn btn-outline-primary mt-auto">Plan My Trip</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAYS WE HELP -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-eyebrow">Ways We Help</div>
+      <h2 class="mt-2">Coverage across the entire process</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          <div class="card-body">
+            <span class="icon-badge mb-3">🌍</span>
+            <h3 class="h6 mt-3">Country Selection</h3>
+            <p class="text-muted small mb-0">Match your field of study, budget, and post-study or long-stay goals to the right destination.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          <div class="card-body">
+            <span class="icon-badge mb-3">🛂</span>
+            <h3 class="h6 mt-3">Visa Strategy</h3>
+            <p class="text-muted small mb-0">Understand which visa category actually applies to your passport and purpose of travel.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          <div class="card-body">
+            <span class="icon-badge mb-3">📑</span>
+            <h3 class="h6 mt-3">Document Checklists</h3>
+            <p class="text-muted small mb-0">Exact, checkable requirements — transcripts, SOPs, proof of funds, insurance, and more.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          <div class="card-body">
+            <span class="icon-badge mb-3">💰</span>
+            <h3 class="h6 mt-3">Funds &amp; Insurance</h3>
+            <p class="text-muted small mb-0">Blocked accounts, financial self-sufficiency thresholds, and health coverage requirements.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          <div class="card-body">
+            <span class="icon-badge mb-3">🏠</span>
+            <h3 class="h6 mt-3">Pre-Departure Planning</h3>
+            <p class="text-muted small mb-0">Housing hunts, flight windows, currency conversion, and orientation timelines.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          <div class="card-body">
+            <span class="icon-badge mb-3">🛃</span>
+            <h3 class="h6 mt-3">Arrival Compliance</h3>
+            <p class="text-muted small mb-0">Customs declarations, immunizations, and what to expect at the port-of-entry interview.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY TRUST US -->
+<section class="container py-5">
+  <div class="text-center mb-5">
+    <div class="section-eyebrow">Why Travel Assist</div>
+    <h2 class="mt-2">Built for precision, not guesswork</h2>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="text-center">
+        <span class="icon-badge mx-auto mb-3">🎯</span>
+        <h3 class="h6">No hallucinated legal content</h3>
+        <p class="text-muted small">When a rule varies by nationality or a figure isn't confirmed, we flag it for official embassy verification instead of guessing.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-center">
+        <span class="icon-badge mx-auto mb-3">🤝</span>
+        <h3 class="h6">Empathetic, but precise</h3>
+        <p class="text-muted small">Moving abroad is stressful. We keep the tone human while staying strict about deadlines, fees, and processing times.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-center">
+        <span class="icon-badge mx-auto mb-3">🧩</span>
+        <h3 class="h6">Sequenced, not overwhelming</h3>
+        <p class="text-muted small">Every journey is broken into clear phases and checklists so you always know exactly what's next.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-band py-5">
+  <div class="container text-center">
+    <h2 class="fw-bold">Ready to map your journey?</h2>
+    <p class="lead text-white-75 col-lg-7 mx-auto">
+      Tell us your passport, destination, and timeline — get a personalized, phase-by-phase plan in minutes.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+      <a href="/chat.html?intent=study" class="btn btn-light btn-lg px-4">🎓 Start Studying Abroad</a>
+      <a href="/chat.html?intent=travel" class="btn btn-outline-light btn-lg px-4">✈️ Start Planning Travel</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-muted small py-4">
+  &copy; 2026 Travel Assist &middot; Informational guidance only — not legal advice, no guaranteed outcomes.
+</footer>
+</body>
+</html>

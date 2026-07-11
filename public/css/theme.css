@@ -1,0 +1,62 @@
+/* Travel Assist brand theme: navy replaces Bootstrap's default blue everywhere. */
+:root {
+  --navy: #0d1b2a;
+  --navy-mid: #16324f;
+  --navy-dark: #081019;
+}
+
+a {
+  color: var(--navy);
+}
+a:hover,
+a:focus {
+  color: var(--navy-mid);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--navy);
+  --bs-btn-border-color: var(--navy);
+  --bs-btn-hover-bg: var(--navy-mid);
+  --bs-btn-hover-border-color: var(--navy-mid);
+  --bs-btn-active-bg: var(--navy-dark);
+  --bs-btn-active-border-color: var(--navy-dark);
+  --bs-btn-disabled-bg: var(--navy);
+  --bs-btn-disabled-border-color: var(--navy);
+  --bs-btn-focus-shadow-rgb: 13, 27, 42;
+  background-color: var(--navy);
+  border-color: var(--navy);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--navy-mid);
+  border-color: var(--navy-mid);
+}
+.btn-primary:active {
+  background-color: var(--navy-dark) !important;
+  border-color: var(--navy-dark) !important;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--navy);
+  --bs-btn-border-color: var(--navy);
+  --bs-btn-hover-bg: var(--navy);
+  --bs-btn-hover-border-color: var(--navy);
+  --bs-btn-active-bg: var(--navy-dark);
+  --bs-btn-active-border-color: var(--navy-dark);
+  --bs-btn-focus-shadow-rgb: 13, 27, 42;
+  color: var(--navy);
+  border-color: var(--navy);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--navy);
+  border-color: var(--navy);
+}
+
+.text-primary { color: var(--navy) !important; }
+.bg-primary { background-color: var(--navy) !important; }
+.border-primary { border-color: var(--navy) !important; }
+
+.bg-navy { background-color: var(--navy) !important; }
+.bg-navy-mid { background-color: var(--navy-mid) !important; }
+.text-navy { color: var(--navy) !important; }
