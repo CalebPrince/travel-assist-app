@@ -69,14 +69,20 @@ class PlanController
     {
         header('Content-Type: application/json');
 
-        $pdo = Database::connection();
-        $sessionId = Session::resolve($pdo);
+        try {
+            $pdo = Database::connection();
+            $sessionId = Session::resolve($pdo);
 
-        $stmt = $pdo->prepare(
-            'SELECT id, plan_json, checked_json FROM plans WHERE session_id = ? ORDER BY id DESC LIMIT 1'
-        );
-        $stmt->execute([$sessionId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $pdo->prepare(
+                'SELECT id, plan_json, checked_json FROM plans WHERE session_id = ? ORDER BY id DESC LIMIT 1'
+            );
+            $stmt->execute([$sessionId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Could not load your plan.', 'detail' => $e->getMessage()]);
+            return;
+        }
 
         if ($row === false) {
             echo json_encode(['plan' => null]);
@@ -108,15 +114,22 @@ class PlanController
         // Keep only scalar item keys, so we store a clean, predictable array.
         $checked = array_values(array_filter($checked, 'is_string'));
 
-        $pdo = Database::connection();
-        $sessionId = Session::resolve($pdo);
+        try {
+            $pdo = Database::connection();
+            $sessionId = Session::resolve($pdo);
 
-        // Scope the update to this visitor's own plan — a session can never
-        // touch another visitor's checklist even if it guesses the id.
-        $stmt = $pdo->prepare(
-            'UPDATE plans SET checked_json = ?, updated_at = ? WHERE id = ? AND session_id = ?'
-        );
-        $stmt->execute([json_encode($checked), gmdate('c'), $planId, $sessionId]);
+            // Scope the update to this visitor's own plan — a session can
+            // never touch another visitor's checklist even if it guesses
+            // the id.
+            $stmt = $pdo->prepare(
+                'UPDATE plans SET checked_json = ?, updated_at = ? WHERE id = ? AND session_id = ?'
+            );
+            $stmt->execute([json_encode($checked), gmdate('c'), $planId, $sessionId]);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Could not save your progress.', 'detail' => $e->getMessage()]);
+            return;
+        }
 
         if ($stmt->rowCount() === 0) {
             http_response_code(404);

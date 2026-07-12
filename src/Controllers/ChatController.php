@@ -26,13 +26,19 @@ class ChatController
             return;
         }
 
-        $pdo = Database::connection();
-        $sessionId = Session::resolve($pdo);
+        try {
+            $pdo = Database::connection();
+            $sessionId = Session::resolve($pdo);
 
-        $insert = $pdo->prepare('INSERT INTO messages (session_id, role, content, created_at) VALUES (?, ?, ?, ?)');
-        $insert->execute([$sessionId, 'user', $message, gmdate('c')]);
+            $insert = $pdo->prepare('INSERT INTO messages (session_id, role, content, created_at) VALUES (?, ?, ?, ?)');
+            $insert->execute([$sessionId, 'user', $message, gmdate('c')]);
 
-        $history = self::loadHistory($pdo, $sessionId);
+            $history = self::loadHistory($pdo, $sessionId);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Could not process your message.', 'detail' => $e->getMessage()]);
+            return;
+        }
 
         try {
             $reply = self::callGroq($history);
@@ -42,7 +48,13 @@ class ChatController
             return;
         }
 
-        $insert->execute([$sessionId, 'assistant', $reply, gmdate('c')]);
+        try {
+            $insert->execute([$sessionId, 'assistant', $reply, gmdate('c')]);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Could not save the reply.', 'detail' => $e->getMessage()]);
+            return;
+        }
 
         echo json_encode(['reply' => $reply]);
     }
