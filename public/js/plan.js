@@ -20,6 +20,7 @@
   const nextStepEl = document.getElementById('plan-next-step');
   const progressBar = document.getElementById('plan-progress-bar');
   const progressLabel = document.getElementById('plan-progress-label');
+  const completeCard = document.getElementById('plan-complete-card');
   const printBtn = document.getElementById('print-btn');
   const restartBtn = document.getElementById('restart-btn');
 
@@ -299,6 +300,7 @@
     progressBar.style.width = `${pct}%`;
     progressBar.setAttribute('aria-valuenow', String(pct));
     progressLabel.textContent = `${done} of ${totalItems} done`;
+    completeCard.classList.toggle('d-none', !(totalItems > 0 && done === totalItems));
   }
 
   // Debounce writes so rapid ticking sends one request, not one per click.
