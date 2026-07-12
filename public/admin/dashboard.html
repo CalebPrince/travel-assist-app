@@ -34,7 +34,7 @@
       <div class="col-md-4">
         <div class="card shadow-sm h-100">
           <div class="card-body">
-            <h2 class="h6 text-muted">Anthropic API Key</h2>
+            <h2 class="h6 text-muted">Groq API Key</h2>
             <p class="mb-1">
               <span id="key-status-dot" class="status-dot bg-secondary"></span>
               <strong id="key-status-text">Checking…</strong>
@@ -64,7 +64,7 @@
     </div>
 
     <div id="key-warning" class="alert alert-warning mt-4 d-none">
-      No Anthropic API key is configured yet. The advisor chat will not respond until you add one in
+      No Groq API key is configured yet. The advisor chat will not respond until you add one in
       <a href="settings.html">Settings</a>.
     </div>
   </main>
@@ -79,10 +79,10 @@
       const dot = document.getElementById('key-status-dot');
       const text = document.getElementById('key-status-text');
 
-      if (settings.anthropic_api_key_set) {
+      if (settings.groq_api_key_set) {
         dot.classList.remove('bg-secondary');
         dot.classList.add('bg-success');
-        text.textContent = `Configured (${settings.anthropic_api_key_preview})`;
+        text.textContent = `Configured (${settings.groq_api_key_preview})`;
       } else {
         dot.classList.remove('bg-secondary');
         dot.classList.add('bg-danger');
@@ -90,7 +90,7 @@
         document.getElementById('key-warning').classList.remove('d-none');
       }
 
-      document.getElementById('model-name').textContent = settings.anthropic_model;
+      document.getElementById('model-name').textContent = settings.groq_model;
     } catch (err) {
       // guard.js already redirects on auth failure; ignore other errors here.
     }

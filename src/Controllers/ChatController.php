@@ -38,7 +38,7 @@ class ChatController
         $history = self::loadHistory($pdo, $sessionId);
 
         try {
-            $reply = self::callAnthropic($history);
+            $reply = self::callGroq($history);
         } catch (Throwable $e) {
             http_response_code(502);
             echo json_encode(['error' => 'AI service unavailable.', 'detail' => $e->getMessage()]);
@@ -90,32 +90,32 @@ class ChatController
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private static function callAnthropic(array $history): string
+    private const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+
+    private static function callGroq(array $history): string
     {
-        $apiKey = Settings::get('anthropic_api_key');
+        $apiKey = Settings::get('groq_api_key');
         if (!$apiKey) {
-            throw new RuntimeException('The Anthropic API key has not been configured yet in the admin settings.');
+            throw new RuntimeException('The Groq API key has not been configured yet in the admin settings.');
         }
 
         $systemPrompt = file_get_contents(__DIR__ . '/../Support/Prompts/immigration_advisor.txt');
-        $model = Settings::get('anthropic_model', 'claude-sonnet-5');
+        $model = Settings::get('groq_model', 'llama-3.3-70b-versatile');
 
-        $messages = array_map(
-            static fn (array $m): array => ['role' => $m['role'], 'content' => $m['content']],
-            $history
-        );
+        $messages = [['role' => 'system', 'content' => $systemPrompt]];
+        foreach ($history as $m) {
+            $messages[] = ['role' => $m['role'], 'content' => $m['content']];
+        }
 
         $payload = json_encode([
             'model' => $model,
             'max_tokens' => 1500,
-            'system' => $systemPrompt,
             'messages' => $messages,
         ]);
 
         $headers = [
             'Content-Type: application/json',
-            'x-api-key: ' . $apiKey,
-            'anthropic-version: 2023-06-01',
+            'Authorization: Bearer ' . $apiKey,
         ];
 
         [$status, $response] = function_exists('curl_init')
@@ -126,23 +126,16 @@ class ChatController
 
         if ($status !== 200) {
             $apiMessage = $decoded['error']['message'] ?? 'Unknown API error';
-            throw new RuntimeException("Anthropic API error ({$status}): {$apiMessage}");
+            throw new RuntimeException("Groq API error ({$status}): {$apiMessage}");
         }
 
-        $text = '';
-        foreach ($decoded['content'] ?? [] as $block) {
-            if (($block['type'] ?? '') === 'text') {
-                $text .= $block['text'];
-            }
-        }
-
-        return $text;
+        return (string) ($decoded['choices'][0]['message']['content'] ?? '');
     }
 
     /** @return array{0: int, 1: string} */
     private static function postViaCurl(string $payload, array $headers): array
     {
-        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        $ch = curl_init(self::GROQ_ENDPOINT);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
@@ -155,7 +148,7 @@ class ChatController
         if ($response === false) {
             $error = curl_error($ch);
             curl_close($ch);
-            throw new RuntimeException('Failed to reach the Anthropic API: ' . $error);
+            throw new RuntimeException('Failed to reach the Groq API: ' . $error);
         }
 
         $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -177,9 +170,9 @@ class ChatController
             ],
         ]);
 
-        $response = @file_get_contents('https://api.anthropic.com/v1/messages', false, $context);
+        $response = @file_get_contents(self::GROQ_ENDPOINT, false, $context);
         if ($response === false) {
-            throw new RuntimeException('Failed to reach the Anthropic API.');
+            throw new RuntimeException('Failed to reach the Groq API.');
         }
 
         $status = 0;

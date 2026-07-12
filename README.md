@@ -1,6 +1,6 @@
 # Travel Assist
 
-An AI-powered advisor for two journeys: **studying abroad** and **general travel/immigration**. It turns visa rules and admissions paperwork into a personalized, phased checklist — with a chat interface backed by the Anthropic API.
+An AI-powered advisor for two journeys: **studying abroad** and **general travel/immigration**. It turns visa rules and admissions paperwork into a personalized, phased checklist — with a chat interface backed by the Groq API.
 
 Zero-bloat by design: no Composer, no Node/npm, no build step. Plain PHP + SQLite on the backend, static HTML/vanilla JS/Bootstrap on the frontend.
 
@@ -30,7 +30,7 @@ This will:
 
 Then:
 1. Visit `/admin/login.html`, sign in with the printed credentials, and change the password immediately
-2. Go to **Settings** and add your Anthropic API key (get one at [console.anthropic.com](https://console.anthropic.com))
+2. Go to **Settings** and add your Groq API key (get one at [console.groq.com/keys](https://console.groq.com/keys))
 3. Visit `/` — the advisor chat is now live
 
 ## Project Structure
@@ -57,7 +57,7 @@ src/
 
 ## Configuration
 
-All runtime configuration (Anthropic API key, model, JWT signing secret) lives in the `settings` table in SQLite, managed through the admin UI — there is no `.env` file to edit. The JWT secret and a default admin account are generated automatically on first migration.
+All runtime configuration (Groq API key, model, JWT signing secret) lives in the `settings` table in SQLite, managed through the admin UI — there is no `.env` file to edit. The JWT secret and a default admin account are generated automatically on first migration.
 
 ## Security Notes
 
@@ -70,7 +70,7 @@ All runtime configuration (Anthropic API key, model, JWT signing secret) lives i
 
 **The most important rule:** the subdomain's document root must point at the `public/` folder specifically — never at the project root.
 
-Ideally, clone the repo *outside* `public_html` entirely (e.g. your home directory) so `src/` and `database/` are never inside any web-served tree. In practice, cPanel's Git tool often defaults to cloning inside `public_html` (e.g. `public_html/travelassist`, with the subdomain root at `public_html/travelassist/public`) — that's fine too, **but only because `database/.htaccess` and `src/.htaccess` in this repo explicitly deny all web access to those folders.** Without them, anyone could download `database/app.sqlite` (which contains the admin password hash and your Anthropic API key) directly via your **primary domain**, e.g. `https://yourdomain.com/travelassist/database/app.sqlite` — since `public_html` is usually the primary domain's own document root, and a subfolder inside it is reachable through that domain too, regardless of what the subdomain's document root points to.
+Ideally, clone the repo *outside* `public_html` entirely (e.g. your home directory) so `src/` and `database/` are never inside any web-served tree. In practice, cPanel's Git tool often defaults to cloning inside `public_html` (e.g. `public_html/travelassist`, with the subdomain root at `public_html/travelassist/public`) — that's fine too, **but only because `database/.htaccess` and `src/.htaccess` in this repo explicitly deny all web access to those folders.** Without them, anyone could download `database/app.sqlite` (which contains the admin password hash and your Groq API key) directly via your **primary domain**, e.g. `https://yourdomain.com/travelassist/database/app.sqlite` — since `public_html` is usually the primary domain's own document root, and a subfolder inside it is reachable through that domain too, regardless of what the subdomain's document root points to.
 
 After deploying, verify this is actually blocked: visit `https://yourdomain.com/travelassist/database/app.sqlite` (adjust the path to match your setup) and confirm you get a 403, not a file download.
 
@@ -107,5 +107,5 @@ This creates `database/app.sqlite`, generates the JWT secret, and seeds a one-ti
 
 1. cPanel → **SSL/TLS Status**, run **AutoSSL** for the subdomain (Namecheap issues a free cert), then enable **Force HTTPS Redirect**
 2. Visit `https://travel.yourdomain.com/admin/login.html`, sign in with the credentials from step 4, and change the password immediately
-3. In **Settings**, add your Anthropic API key
+3. In **Settings**, add your Groq API key
 4. Visit `https://travel.yourdomain.com/` — the advisor is live

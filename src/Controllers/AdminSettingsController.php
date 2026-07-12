@@ -13,12 +13,12 @@ class AdminSettingsController
         header('Content-Type: application/json');
         AdminAuth::requireAuth();
 
-        $apiKey = (string) Settings::get('anthropic_api_key', '');
+        $apiKey = (string) Settings::get('groq_api_key', '');
 
         echo json_encode([
-            'anthropic_api_key_set' => $apiKey !== '',
-            'anthropic_api_key_preview' => self::maskKey($apiKey),
-            'anthropic_model' => Settings::get('anthropic_model', 'claude-sonnet-5'),
+            'groq_api_key_set' => $apiKey !== '',
+            'groq_api_key_preview' => self::maskKey($apiKey),
+            'groq_model' => Settings::get('groq_model', 'llama-3.3-70b-versatile'),
         ]);
     }
 
@@ -29,17 +29,17 @@ class AdminSettingsController
 
         $input = json_decode((string) file_get_contents('php://input'), true) ?? [];
 
-        if (array_key_exists('anthropic_api_key', $input)) {
-            $apiKey = trim((string) $input['anthropic_api_key']);
+        if (array_key_exists('groq_api_key', $input)) {
+            $apiKey = trim((string) $input['groq_api_key']);
             if ($apiKey !== '') {
-                Settings::set('anthropic_api_key', $apiKey);
+                Settings::set('groq_api_key', $apiKey);
             }
         }
 
-        if (array_key_exists('anthropic_model', $input)) {
-            $model = trim((string) $input['anthropic_model']);
+        if (array_key_exists('groq_model', $input)) {
+            $model = trim((string) $input['groq_model']);
             if ($model !== '') {
-                Settings::set('anthropic_model', $model);
+                Settings::set('groq_model', $model);
             }
         }
 

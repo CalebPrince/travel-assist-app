@@ -23,8 +23,8 @@ function seedSettingIfMissing(PDO $pdo, string $key, string $value): void
 seedSettingIfMissing($pdo, 'jwt_secret', bin2hex(random_bytes(32)));
 
 // Advisor configuration, editable later from the admin settings page.
-seedSettingIfMissing($pdo, 'anthropic_api_key', '');
-seedSettingIfMissing($pdo, 'anthropic_model', 'claude-sonnet-5');
+seedSettingIfMissing($pdo, 'groq_api_key', '');
+seedSettingIfMissing($pdo, 'groq_model', 'llama-3.3-70b-versatile');
 
 // Create a one-time default admin account if none exists yet.
 $adminCount = (int) $pdo->query('SELECT COUNT(*) FROM admins')->fetchColumn();
