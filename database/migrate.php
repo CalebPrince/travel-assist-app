@@ -24,7 +24,7 @@ seedSettingIfMissing($pdo, 'jwt_secret', bin2hex(random_bytes(32)));
 
 // Advisor configuration, editable later from the admin settings page.
 seedSettingIfMissing($pdo, 'groq_api_key', '');
-seedSettingIfMissing($pdo, 'groq_model', 'llama-3.3-70b-versatile');
+seedSettingIfMissing($pdo, 'groq_model', 'llama-3.1-8b-instant');
 
 // Create a one-time default admin account if none exists yet.
 $adminCount = (int) $pdo->query('SELECT COUNT(*) FROM admins')->fetchColumn();

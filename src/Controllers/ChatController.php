@@ -14,7 +14,7 @@ class ChatController
 {
     private const SESSION_COOKIE = 'travel_assist_session';
     private const SESSION_TTL = 60 * 60 * 24 * 7; // 7 days
-    private const HISTORY_LIMIT = 40;
+    private const HISTORY_LIMIT = 20;
 
     public static function handle(): void
     {
@@ -100,7 +100,7 @@ class ChatController
         }
 
         $systemPrompt = file_get_contents(__DIR__ . '/../Support/Prompts/immigration_advisor.txt');
-        $model = Settings::get('groq_model', 'llama-3.3-70b-versatile');
+        $model = Settings::get('groq_model', 'llama-3.1-8b-instant');
 
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
         foreach ($history as $m) {
@@ -123,6 +123,14 @@ class ChatController
             : self::postViaStream($payload, $headers);
 
         $decoded = json_decode($response, true);
+
+        if ($status === 429) {
+            throw new RuntimeException(
+                'The Groq model in use has hit its usage limit for today. '
+                . 'An admin can switch to a different model in Settings to restore service immediately, '
+                . 'or wait for the daily limit to reset.'
+            );
+        }
 
         if ($status !== 200) {
             $apiMessage = $decoded['error']['message'] ?? 'Unknown API error';

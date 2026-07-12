@@ -18,7 +18,7 @@ class AdminSettingsController
         echo json_encode([
             'groq_api_key_set' => $apiKey !== '',
             'groq_api_key_preview' => self::maskKey($apiKey),
-            'groq_model' => Settings::get('groq_model', 'llama-3.3-70b-versatile'),
+            'groq_model' => Settings::get('groq_model', 'llama-3.1-8b-instant'),
         ]);
     }
 
