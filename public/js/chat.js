@@ -62,6 +62,104 @@
     return bubble;
   }
 
+  // Pulls out any `[ASK: ...]` lines the advisor used to request specific
+  // pieces of information, leaving the rest of its message intact.
+  function extractAskQuestions(raw) {
+    const questions = [];
+    const cleaned = raw
+      .replace(/^\s*\[ASK:\s*(.+?)\]\s*$/gm, (match, q) => {
+        questions.push(q.trim());
+        return '';
+      })
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    return { cleaned, questions };
+  }
+
+  // Walks the user through a batch of advisor questions one at a time,
+  // inline in the chat, then hands the combined Q&A back as one message.
+  function appendWizard(questions, onDone) {
+    input.disabled = true;
+    form.classList.add('d-none');
+
+    const wizard = document.createElement('div');
+    wizard.className = 'card shadow-sm mb-3';
+    wizard.innerHTML = `
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small wizard-progress"></span>
+          <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 wizard-skip">Skip, I'll just type &rarr;</button>
+        </div>
+        <div class="fw-semibold mb-2 wizard-question"></div>
+        <form class="wizard-form">
+          <div class="mb-2">
+            <input type="text" class="form-control wizard-input" autocomplete="off" required>
+          </div>
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-link text-decoration-none px-0 invisible wizard-back">&larr; Back</button>
+            <button type="submit" class="btn btn-primary btn-sm">Next</button>
+          </div>
+        </form>
+      </div>
+    `;
+    chatWindow.appendChild(wizard);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    const progressEl = wizard.querySelector('.wizard-progress');
+    const questionEl = wizard.querySelector('.wizard-question');
+    const formEl = wizard.querySelector('.wizard-form');
+    const inputEl = wizard.querySelector('.wizard-input');
+    const backEl = wizard.querySelector('.wizard-back');
+    const skipEl = wizard.querySelector('.wizard-skip');
+
+    const answers = [];
+    let idx = 0;
+
+    function render() {
+      progressEl.textContent = `Question ${idx + 1} of ${questions.length}`;
+      questionEl.textContent = questions[idx];
+      backEl.classList.toggle('invisible', idx === 0);
+      inputEl.value = answers[idx] || '';
+      inputEl.focus();
+    }
+
+    function resumeFreeText() {
+      wizard.remove();
+      form.classList.remove('d-none');
+      input.disabled = false;
+    }
+
+    formEl.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = inputEl.value.trim();
+      if (!value) return;
+      answers[idx] = value;
+      idx += 1;
+
+      if (idx >= questions.length) {
+        wizard.remove();
+        form.classList.remove('d-none');
+        input.disabled = false;
+        onDone(questions.map((q, i) => `${q} → ${answers[i]}`).join('\n'));
+      } else {
+        render();
+      }
+    });
+
+    backEl.addEventListener('click', () => {
+      if (idx === 0) return;
+      idx -= 1;
+      render();
+    });
+
+    skipEl.addEventListener('click', () => {
+      resumeFreeText();
+      input.focus();
+    });
+
+    render();
+  }
+
   async function sendMessage(message) {
     appendBubble('user', message);
     input.disabled = true;
@@ -70,14 +168,25 @@
 
     try {
       const { reply } = await Api.sendChatMessage(message);
-      pending.innerHTML = renderAssistantMarkdown(reply);
+      const { cleaned, questions } = extractAskQuestions(reply);
+
+      if (cleaned) {
+        pending.innerHTML = renderAssistantMarkdown(cleaned);
+      } else {
+        pending.remove();
+      }
+
+      if (questions.length > 0) {
+        appendWizard(questions, (combinedAnswer) => sendMessage(combinedAnswer));
+        return;
+      }
     } catch (err) {
       pending.innerHTML = `<em>Something went wrong: ${escapeHtml(err.message)}</em>`;
-    } finally {
-      input.disabled = false;
-      input.focus();
-      chatWindow.scrollTop = chatWindow.scrollHeight;
     }
+
+    input.disabled = false;
+    input.focus();
+    chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
   // --- Step-by-step intake wizard ---
