@@ -33,11 +33,36 @@
     verify final requirements with the official embassy, consulate, or institution before you act.
   </div>
 
-  <div class="card shadow-sm">
+  <div id="intake-card" class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted small" id="intake-progress"></span>
+        <button type="button" id="intake-skip" class="btn btn-sm btn-link text-decoration-none p-0">Skip, I'll just type &rarr;</button>
+      </div>
+      <h2 class="h5 mb-3" id="intake-question"></h2>
+
+      <div id="intake-choice-buttons" class="d-flex gap-3 mb-2 d-none">
+        <button type="button" class="btn btn-outline-primary flex-fill py-3" data-value="study">🎓 Studying Abroad</button>
+        <button type="button" class="btn btn-outline-primary flex-fill py-3" data-value="travel">✈️ General Travel</button>
+      </div>
+
+      <form id="intake-text-form" class="d-none">
+        <div class="mb-3">
+          <input type="text" id="intake-input" class="form-control" autocomplete="off" required>
+        </div>
+        <div class="d-flex justify-content-between">
+          <button type="button" id="intake-back" class="btn btn-link text-decoration-none px-0 invisible">&larr; Back</button>
+          <button type="submit" class="btn btn-primary">Next</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="chat-card" class="card shadow-sm d-none">
     <div class="card-body">
       <div id="chat-window" class="d-flex flex-column mb-3"></div>
       <form id="chat-form" class="d-flex gap-2">
-        <input id="chat-input" type="text" class="form-control" placeholder="Tell us: study or travel? Where from, where to, and your timeline..." autocomplete="off" required>
+        <input id="chat-input" type="text" class="form-control" placeholder="Ask a follow-up..." autocomplete="off" required>
         <button type="submit" class="btn btn-primary">Send</button>
       </form>
     </div>
