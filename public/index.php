@@ -17,7 +17,18 @@ spl_autoload_register(static function (string $class): void {
 
 use App\Router;
 
-$path = (string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Requests may arrive through a mount prefix (e.g. a subfolder deployment
+// like /travelassist/public/) rather than the domain root. Derive that
+// prefix from where index.php itself resolves and strip it before routing,
+// so the app works the same regardless of where it's mounted.
+$basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+$fullPath = (string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = ($basePath !== '' && str_starts_with($fullPath, $basePath))
+    ? substr($fullPath, strlen($basePath))
+    : $fullPath;
+if ($path === '') {
+    $path = '/';
+}
 
 if (!str_starts_with($path, '/api/')) {
     header('Content-Type: text/html; charset=utf-8');

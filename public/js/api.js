@@ -1,6 +1,6 @@
 const Api = {
   async sendChatMessage(message) {
-    const res = await fetch('/api/v1/chat', {
+    const res = await fetch('api/v1/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
