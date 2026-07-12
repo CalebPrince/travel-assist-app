@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - /bin/echo "Running database migrations..."
+    - php database/migrate.php
