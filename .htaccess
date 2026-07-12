@@ -1,0 +1,9 @@
+Options -Indexes
+
+<FilesMatch "\.(md|py)$">
+    Require all denied
+</FilesMatch>
+
+<Files ".gitignore">
+    Require all denied
+</Files>
