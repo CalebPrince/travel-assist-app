@@ -163,7 +163,12 @@
   }
 
   // --- Plan generation ----------------------------------------------------
+  // Errors can happen either while generating a new plan or while loading an
+  // existing one on boot; retryAction tracks which one to re-run.
+  let retryAction = generate;
+
   async function generate() {
+    retryAction = generate;
     showOnly(loadingCard);
     try {
       const data = await Api.generatePlan(answers);
@@ -174,7 +179,7 @@
     }
   }
 
-  errorRetry.addEventListener('click', generate);
+  errorRetry.addEventListener('click', () => retryAction());
 
   // --- Dashboard ----------------------------------------------------------
   let planId = null;
@@ -327,8 +332,13 @@
 
   // --- Boot ---------------------------------------------------------------
   // Resume an existing plan for this session if one exists; otherwise begin
-  // the intake wizard.
-  (async function boot() {
+  // the intake wizard. A thrown error here means the load itself failed
+  // (e.g. a backend/DB hiccup) — distinct from data.plan === null, which
+  // just means this visitor hasn't built a plan yet — so it gets its own
+  // error state instead of silently dropping a returning visitor back into
+  // the wizard as if they were new.
+  async function boot() {
+    retryAction = boot;
     try {
       const data = await Api.getPlan();
       if (data && data.plan) {
@@ -336,8 +346,12 @@
         return;
       }
     } catch (err) {
-      // Ignore and fall through to the wizard.
+      errorText.textContent = `Couldn't load your saved plan. ${err.message}`;
+      showOnly(errorCard);
+      return;
     }
     startWizard();
-  })();
+  }
+
+  boot();
 })();
