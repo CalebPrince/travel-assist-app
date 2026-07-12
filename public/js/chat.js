@@ -19,16 +19,18 @@
     return div.innerHTML;
   }
 
-  // Minimal renderer for the advisor's Markdown-style output (## headers, -/[ ] lists, **bold**).
+  // Minimal renderer for the advisor's Markdown-style output (## headers, -/* [ ] lists, **bold**).
   function renderAssistantMarkdown(raw) {
     const lines = escapeHtml(raw).split('\n');
+    const isListLine = (l) => /^[-*]\s+/.test(l);
     let html = '';
     let inList = false;
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       const heading = line.match(/^##\s+(.*)/);
-      const checklistItem = line.match(/^-\s+\[([ xX])\]\s+(.*)/);
-      const bulletItem = line.match(/^-\s+(.*)/);
+      const checklistItem = line.match(/^[-*]\s+\[([ xX])\]\s+(.*)/);
+      const bulletItem = line.match(/^[-*]\s+(.*)/);
 
       if (heading) {
         if (inList) { html += '</ul>'; inList = false; }
@@ -44,8 +46,17 @@
         continue;
       }
 
+      if (line.trim() === '') {
+        // A blank line between two list items is just the model's spacing habit,
+        // not a real paragraph break — stay inside the list instead of splitting it.
+        const nextNonEmpty = lines.slice(i + 1).find((l) => l.trim() !== '');
+        if (inList && nextNonEmpty && isListLine(nextNonEmpty)) { continue; }
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<br>';
+        continue;
+      }
+
       if (inList) { html += '</ul>'; inList = false; }
-      if (line.trim() === '') { html += '<br>'; continue; }
       html += `<p>${line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`;
     }
 
@@ -62,15 +73,20 @@
     return bubble;
   }
 
-  // Pulls out any `[ASK: ...]` lines the advisor used to request specific
-  // pieces of information, leaving the rest of its message intact.
+  // Pulls out any `[ASK: ...]` tags the advisor used to request specific
+  // pieces of information, leaving the rest of its message intact. The model
+  // doesn't always put these strictly alone on a line (it sometimes wraps
+  // them in a bullet or numbered marker), so this matches the tag anywhere
+  // and then cleans up any list marker left dangling with nothing after it.
   function extractAskQuestions(raw) {
     const questions = [];
     const cleaned = raw
-      .replace(/^\s*\[ASK:\s*(.+?)\]\s*$/gm, (match, q) => {
+      .replace(/\[ASK:\s*([^\]]+?)\]/g, (match, q) => {
         questions.push(q.trim());
         return '';
       })
+      .replace(/^\s*[-*]\s*$/gm, '')
+      .replace(/^\s*\d+\.\s*$/gm, '')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
     return { cleaned, questions };
