@@ -7,9 +7,10 @@ Zero-bloat by design: no Composer, no Node/npm, no build step. Plain PHP + SQLit
 ## Features
 
 - **Landing page** — explains the platform, with separate entry points for students vs. travelers
-- **Advisor chat** (`/chat.html`) — phased guidance (Academic Selection → Admissions → Visa Docs → Pre-Departure for students; Visa Matrix → Document Stack → Arrival Compliance for travelers), session persistence via JWT cookies
+- **Plan builder** (`/plan.html`) — the primary experience. A short intake wizard (journey type, passport, destination, timeline, plus study/travel-specific questions) collects the visitor's situation up front, then the AI generates one personalized, phased checklist in a single call. The result is an interactive dashboard: tick items off, watch a progress bar, print/save as PDF, and items whose exact requirement depends on nationality are flagged **Verify with embassy**. Checklist state is saved per session, so the plan is there when the visitor comes back.
+- **Advisor chat** (`/chat.html`) — the live, free-form alternative for follow-up questions: phased guidance (Academic Selection → Admissions → Visa Docs → Pre-Departure for students; Visa Matrix → Document Stack → Arrival Compliance for travelers), session persistence via JWT cookies
 - **Admin dashboard** (`/admin`) — API key and model are managed here, in the database, never in code or `.env`
-- **Legal disclaimer** — surfaced on the landing page, in the chat UI, and baked into the AI's own system prompt: informational guidance only, no guaranteed outcomes
+- **Legal disclaimer** — surfaced on the landing page, in the plan builder and chat UI, and baked into the AI's own system prompts: informational guidance only, no guaranteed outcomes
 
 ## Requirements
 
@@ -31,28 +32,29 @@ This will:
 Then:
 1. Visit `/admin/login.html`, sign in with the printed credentials, and change the password immediately
 2. Go to **Settings** and add your Groq API key (get one at [console.groq.com/keys](https://console.groq.com/keys))
-3. Visit `/` — the advisor chat is now live
+3. Visit `/` — the plan builder (and advisor chat) are now live
 
 ## Project Structure
 
 ```
 server.py                  Orchestrator: checks environment, runs migrations, starts PHP server
 database/
-  schema.sql                Table definitions (sessions, messages, admins, settings)
+  schema.sql                Table definitions (sessions, messages, plans, admins, settings)
   migrate.php                Idempotent migration runner + first-run seeding
 public/                    Web root (point your server/subdomain document root here)
   index.php                  Front controller for /api/v1/* routes
   router.php                  Dev-server router, used only by `php -S` (see Getting Started)
   .htaccess                   Apache/LiteSpeed rewrite rules, used only on real web servers (see Deployment)
   index.html                  Landing page
-  chat.html                   Advisor chat UI
+  plan.html                   Plan builder: intake wizard + generated checklist dashboard
+  chat.html                   Advisor chat UI (free-form follow-up alternative)
   admin/                       Admin dashboard (login, settings, dashboard)
-  js/, css/                    Shared frontend assets
+  js/, css/                    Shared frontend assets (js/plan.js drives the plan builder)
 src/
   Router.php                  Minimal method+path router
-  Controllers/                 ChatController, AdminAuthController, AdminSettingsController
-  Support/                     Database (PDO singleton), Settings (DB-backed config), Jwt, AdminAuth
-  Support/Prompts/              The advisor's system prompt
+  Controllers/                 ChatController, PlanController, AdminAuthController, AdminSettingsController
+  Support/                     Database (PDO singleton), Settings, Jwt, AdminAuth, Session, GroqClient
+  Support/Prompts/              The advisor chat prompt + the plan generator prompt
 ```
 
 ## Configuration

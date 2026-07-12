@@ -38,6 +38,9 @@ if (!str_starts_with($path, '/api/')) {
 
 $router = new Router();
 $router->add('POST', '/api/v1/chat', [App\Controllers\ChatController::class, 'handle']);
+$router->add('POST', '/api/v1/plan', [App\Controllers\PlanController::class, 'create']);
+$router->add('GET', '/api/v1/plan', [App\Controllers\PlanController::class, 'show']);
+$router->add('POST', '/api/v1/plan/progress', [App\Controllers\PlanController::class, 'progress']);
 $router->add('POST', '/api/v1/admin/login', [App\Controllers\AdminAuthController::class, 'login']);
 $router->add('POST', '/api/v1/admin/logout', [App\Controllers\AdminAuthController::class, 'logout']);
 $router->add('GET', '/api/v1/admin/me', [App\Controllers\AdminAuthController::class, 'me']);
