@@ -91,6 +91,15 @@ Preferred — cPanel's **Git™ Version Control** tool (Namecheap cPanel include
 
 To ship updates later, `git push` to GitHub, then in cPanel go to the repo → **Manage** → **Pull or Deploy** → **Update from Remote**, then click **Deploy HEAD Commit**. The repo's `.cpanel.yml` runs `php database/migrate.php` as part of that deploy step, so any new tables/columns in `schema.sql` (like the `plans` table added for the plan builder) are created automatically — no manual migration step needed after the first deploy. (`Update from Remote` alone only pulls the code; you still need to click `Deploy HEAD Commit` for the migration to run.)
 
+**If `Deploy HEAD Commit` is greyed out or missing** (this happens — some cPanel setups don't expose it, especially when the repository path itself is the deployment target rather than a separate checkout), use Terminal instead:
+
+```bash
+cd ~/public_html/travelassist   # your actual repository path — check Git Version Control → Manage if unsure
+git pull
+```
+
+This gets the code live immediately, but it **skips `.cpanel.yml`**, so if the update includes a `schema.sql` change, also run `php database/migrate.php` right after — it's idempotent and safe to run anytime.
+
 Fallback — no Git tool available: zip the repo locally, upload via **File Manager**, extract, and set the document root the same way.
 
 ### 3. Set the PHP version and extensions
@@ -100,7 +109,7 @@ cPanel → **Select PHP Extensions** (or **MultiPHP INI Editor**): ensure `pdo_s
 
 ### 4. Run the migration once
 
-This creates `database/app.sqlite`, generates the JWT secret, and seeds a one-time admin account. (After this first run, `.cpanel.yml` re-runs the same idempotent migration automatically on every future `Deploy HEAD Commit` — see the "ship updates" note above — so you only need to do this by hand for the very first deploy.)
+This creates `database/app.sqlite`, generates the JWT secret, and seeds a one-time admin account. (After this first run, `.cpanel.yml` re-runs the same idempotent migration automatically on every future `Deploy HEAD Commit` — see the "ship updates" note above — so you only need to do this by hand for the very first deploy, *unless* you're on the `git pull` fallback, in which case re-run it by hand after any update that touches `schema.sql`.)
 
 - If cPanel gives you **Terminal** (Namecheap shared hosting usually does): `cd` into your repository path (e.g. `~/travelassist` or `~/public_html/travelassist`) and run `php database/migrate.php` — copy the printed admin username/password before closing.
 - No Terminal: temporarily create `public/migrate-once.php` containing `<?php require __DIR__ . '/../database/migrate.php';`, visit `https://travel.yourdomain.com/migrate-once.php` once in a browser to see the output, then **delete that file immediately** — leaving a public migration endpoint live is a security hole.
